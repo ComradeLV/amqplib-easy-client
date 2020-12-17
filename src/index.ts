@@ -21,7 +21,7 @@ class AmqpClient {
     private _queueList: Queue [] = [];
     private _consumerList: Consumer [] = [];
     private _logPrefix: string = "[AMQP_CLIENT]";
-    private _selfId: string;
+    private _selfId?: string;
     private _statusQueue: string = "AMQP_CLIENT_STATUS";
 
     //Public methods
@@ -30,7 +30,6 @@ class AmqpClient {
         this._connectionString = conn_string;
         this._queueList = queue_list;
         this._consumerList = consumer_list;
-        this._selfId = this._createSelfId();
     }   
 
     setConnectionString(conn_string: string) {
@@ -50,9 +49,16 @@ class AmqpClient {
     addConsumer(queue_name: string, callback: Function, options: any = { noAck: true }) {
         this._consumerList.push({ name: queue_name, callback: callback, options: options });
     }
+    
+    setClientId(clientId: string) {
+        this._selfId = clientId;
+    }
 
     //Perform a connection with defined queues and consumers
     async connect() {
+        if (!this._selfId) {
+            this._selfId = this._createSelfId();
+        }
         let validate = true;
         if (this._queueList.length == 0) {
             validate = false;
@@ -107,7 +113,7 @@ class AmqpClient {
             this._connection = conn;
             this._connection.createChannel((err: any, channel: any) => this.channelCallback(err, channel));
             this.log("[\x1b[32m✔\x1b[0m] Connection established");
-            this.log(`Client Self ID is \x1b[33m${this._selfId}\x1b[0m`);
+            this.log(`Client ID is \x1b[33m${this._selfId}\x1b[0m`);
         }
         this._connectionPending = false;
     }

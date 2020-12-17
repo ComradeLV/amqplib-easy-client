@@ -23,6 +23,7 @@ declare class AmqpClient {
     setStatusQueueName(queue_name: string): void;
     addQueue(queue_name: string, options?: any): void;
     addConsumer(queue_name: string, callback: Function, options?: any): void;
+    setClientId(clientId: string): void;
     connect(): Promise<void>;
     sendMessage(queue: string, data: any): Promise<void>;
     log(content: any, ...args: any[]): void;

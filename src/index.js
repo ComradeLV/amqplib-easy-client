@@ -62,7 +62,7 @@ var AmqpClient = /** @class */ (function () {
         this._connectionString = conn_string;
         this._queueList = queue_list;
         this._consumerList = consumer_list;
-        this._selfId = this._createSelfId();
+        this._selfId = null;
     }
     AmqpClient.prototype.setConnectionString = function (conn_string) {
         this._connectionString = conn_string;
@@ -80,6 +80,9 @@ var AmqpClient = /** @class */ (function () {
         if (options === void 0) { options = { noAck: true }; }
         this._consumerList.push({ name: queue_name, callback: callback, options: options });
     };
+    AmqpClient.prototype.setClientId = function (clientId) {
+        this._selfId = clientId;
+    };
     //Perform a connection with defined queues and consumers
     AmqpClient.prototype.connect = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -88,6 +91,9 @@ var AmqpClient = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        if (!this._selfId) {
+                            this._selfId = this._createSelfId();
+                        }
                         validate = true;
                         if (this._queueList.length == 0) {
                             validate = false;
@@ -159,7 +165,7 @@ var AmqpClient = /** @class */ (function () {
             this._connection = conn;
             this._connection.createChannel(function (err, channel) { return _this.channelCallback(err, channel); });
             this.log("[\x1b[32m✔\x1b[0m] Connection established");
-            this.log("Client Self ID is \u001B[33m" + this._selfId + "\u001B[0m");
+            this.log("Client ID is \u001B[33m" + this._selfId + "\u001B[0m");
         }
         this._connectionPending = false;
     };
