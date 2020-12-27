@@ -1,4 +1,5 @@
-const amqp = require('amqplib/callback_api');
+import amqp from 'amqplib/callback_api';
+import chalk from 'chalk';
 
 export interface Consumer {
     name: string,
@@ -62,11 +63,11 @@ class AmqpClient {
         let validate = true;
         if (this._queueList.length == 0) {
             validate = false;
-            this.log("[\x1b[31m✘\x1b[0m] Queue list shouldn't be empty when opening a new connection");
+            this.log(chalk.red("[✘]"), "Queue list shouldn't be empty when opening a new connection");
         }
         if (this._consumerList.length == 0) {
             validate = false;
-            this.log("[\x1b[31m✘\x1b[0m] Consumer list shouldn't be empty when opening a new connection");
+            this.log(chalk.red("[✘]"), "Consumer list shouldn't be empty when opening a new connection");
         }
         if (validate) {
             this._connectionPending = true;
@@ -82,7 +83,7 @@ class AmqpClient {
             try {
                 this._channel.sendToQueue(queue, Buffer.from(JSON.stringify(data)));
             } catch (err) {
-                this.log("[\x1b[31m✘] Error while sending message");
+                this.log(chalk.red("[✘]"), "Error while sending message");
                 this._connection = null;
                 this._channel = null;
                 this.connect();
@@ -108,12 +109,12 @@ class AmqpClient {
     
     private connectionCallback(err: any, conn: any) {
         if (err) {
-            this.log("Connection error: ", err.toString());
+            this.log(chalk.red("[✘]"), "Connection error: ", err.toString());
         } else {
             this._connection = conn;
             this._connection.createChannel((err: any, channel: any) => this.channelCallback(err, channel));
-            this.log("[\x1b[32m✔\x1b[0m] Connection established");
-            this.log(`Client ID is \x1b[33m${this._selfId}\x1b[0m`);
+            this.log(chalk.green("[✔]"), "Connection established!");
+            this.log(chalk.blue(`[${chalk.bold("i")}]`), "Client ID is", chalk.yellow(this._selfId));
         }
         this._connectionPending = false;
     }
@@ -122,7 +123,7 @@ class AmqpClient {
     //Each pre-defined queue and consumer are asserted or connected to the channel
     private channelCallback(err: any, channel: any) {
         if (err) {
-            this.log("[\x1b[31m✘\x1b[0m] Error while creating channel: ", err.toString());
+            this.log(chalk.red("[✘]"), "Error while creating channel", err.toString());
         } else {
             this._channel = channel;
             //Connecting queues defined in list
@@ -142,8 +143,7 @@ class AmqpClient {
             try {
                 this._channel.sendToQueue(this._statusQueue, Buffer.from(JSON.stringify({ clientId: this._selfId, dt: new Date() })));
             } catch (err) {
-                this.log(err.toString());
-                this.log("[\x1b[31m✘\x1b[0m] Connection lost. Reconnecting");
+                this.log(chalk.red("[✘]"), "Connection lost. Reconnecting", err.toString());
                 this._connection = null;
                 this._channel = null;
                 this.connect();
