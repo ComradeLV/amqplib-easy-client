@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-import amqp from "amqplib/callback_api";
+const amqp = require("amqplib/callback_api");
 
 export interface Consumer {
     name: string,
