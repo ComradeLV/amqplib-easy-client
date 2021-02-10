@@ -1,5 +1,5 @@
-import amqp from 'amqplib/callback_api';
-import chalk from 'chalk';
+const chalk = require('chalk');
+import amqp from "amqplib/callback_api";
 
 export interface Consumer {
     name: string,
@@ -12,7 +12,7 @@ export interface Queue {
     options: any
 }
 
-class AmqpClient {
+export default class AmqpClient {
 
     private _connectionString: string = "";
     private _connectionPending: Boolean = false;
@@ -164,5 +164,3 @@ class AmqpClient {
         return s_id;
     }
 }
-
-export default AmqpClient;
