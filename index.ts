@@ -60,19 +60,16 @@ export default class AmqpClient {
         if (!this._selfId) {
             this._selfId = this._createSelfId();
         }
-        let validate = true;
         if (this._queueList.length == 0) {
-            validate = false;
-            this.log(chalk.red("[✘]"), "Queue list shouldn't be empty when opening a new connection");
+            this.log(chalk.yellow("[!]"), "Queue list is empty");
         }
         if (this._consumerList.length == 0) {
-            validate = false;
-            this.log(chalk.red("[✘]"), "Consumer list shouldn't be empty when opening a new connection");
+            this.log(chalk.yellow("[!]"), "Consumer list is empty");
         }
-        if (validate) {
-            this._connectionPending = true;
-            await amqp.connect(this._connectionString, (err: any, conn: any) => this.connectionCallback(err, conn));
-        }
+        
+        this._connectionPending = true;
+        await amqp.connect(this._connectionString, (err: any, conn: any) => this.connectionCallback(err, conn));
+        
         if (!this._statusQueueInitialized) {
             this.addQueue(this._statusQueue);
         }

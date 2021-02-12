@@ -86,7 +86,6 @@ var AmqpClient = /** @class */ (function () {
     //Perform a connection with defined queues and consumers
     AmqpClient.prototype.connect = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var validate;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -94,22 +93,16 @@ var AmqpClient = /** @class */ (function () {
                         if (!this._selfId) {
                             this._selfId = this._createSelfId();
                         }
-                        validate = true;
                         if (this._queueList.length == 0) {
-                            validate = false;
-                            this.log(chalk.red("[✘]"), "Queue list shouldn't be empty when opening a new connection");
+                            this.log(chalk.yellow("[!]"), "Queue list is empty");
                         }
                         if (this._consumerList.length == 0) {
-                            validate = false;
-                            this.log(chalk.red("[✘]"), "Consumer list shouldn't be empty when opening a new connection");
+                            this.log(chalk.yellow("[!]"), "Consumer list is empty");
                         }
-                        if (!validate) return [3 /*break*/, 2];
                         this._connectionPending = true;
                         return [4 /*yield*/, amqp.connect(this._connectionString, function (err, conn) { return _this.connectionCallback(err, conn); })];
                     case 1:
                         _a.sent();
-                        _a.label = 2;
-                    case 2:
                         if (!this._statusQueueInitialized) {
                             this.addQueue(this._statusQueue);
                         }
